@@ -48,4 +48,16 @@ and s.salary =
      group by s1.salary
      having count(distinct s2.salary)=2
  )
+26.汇总各个部门当前员工的title类型的分配数目，即结果给出部门编号dept_no、dept_name、其部门下所有的当前(dept_emp.to_date = '9999-01-01')员工的当前(titles.to_date = '9999-01-01')title以及该类型title对应的数目count
+select dep.dept_no,dep.dept_name,titles.title,count(*)
+from departments dep join dept_emp de on de.to_date='9999-01-01' and
+de.dept_no = dep.dept_no 
+join titles on titles.to_date='9999-01-01' and titles.emp_no=de.emp_no
+group by dep.dept_no,titles.title
+order by dep.dept_no
 
+27.给出每个员工每年薪水涨幅超过5000的员工编号emp_no、薪水变更开始日期from_date以及薪水涨幅值salary_growth，并按照salary_growth逆序排列。
+select s1.emp_no,s1.from_date,s1.salary-s2.salary as salary_growth
+from salaries s1 join salaries s2 on s1.emp_no = s2.emp_no and s1.from_date=s2.to_date
+where s1.salary-s2.salary>5000
+order by salary_growth DESC
