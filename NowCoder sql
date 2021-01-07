@@ -123,3 +123,9 @@ replace into titles_test
 select 5, 10005, title, from_date, to_date
 from titles_test
 where id = 5;
+
+54.查找排除最大、最小salary之后的当前(to_date = '9999-01-01' )员工的平均工资avg_salary。
+select avg(salary) as avg_salary
+from salaries
+where salary>(select min(salary) from salaries where to_date='9999-01-01') and salary<(SELECT max(salary) from salaries where to_date='9999-01-01')
+and to_date='9999-01-01'
