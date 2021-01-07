@@ -61,3 +61,65 @@ select s1.emp_no,s1.from_date,s1.salary-s2.salary as salary_growth
 from salaries s1 join salaries s2 on s1.emp_no = s2.emp_no and s1.from_date=s2.to_date
 where s1.salary-s2.salary>5000
 order by salary_growth DESC
+
+28.查找描述信息(film.description)中包含robot的电影对应的分类名称(category.name)以及电影数目(count(film.film_id))，而且还需要该分类包含电影总数量(count(film_category.category_id))>=5部
+select c.name,count(*) 
+from  film f join film_category fc on f.film_id=fc.film_id and 
+f.description like '%robot%' join category c on fc.category_id=c.category_id
+and c.category_id in (
+    select category_id from film_category 
+    group by category_id
+    having count(*)>=5
+)
+group by c.name;
+29.使用join查询方式找出没有分类的电影id以及名称
+select f.film_id,f.title from film f 
+left join film_category fc on f.film_id = fc.film_id
+where fc.category_id is NULL;
+//依赖左右连接不存在项为NULL
+
+36.创建新表
+create table actor_name as
+select first_name,last_name from actor;
+
+CREATE TABLE actor_name
+(
+first_name varchar(45) NOT NULL,
+last_name varchar(45) NOT NULL
+);
+INSERT INTO actor_name SELECT first_name, last_name FROM actor;
+
+37. 创建索引
+create unique index uniq_idx_firstname on actor(first_name);
+create index idx_lastname on  actor(last_name);
+
+39.强制索引查询
+mysql:select * from salaries force index (idx_emp_no) where emp_no=10005;
+
+40.添加列
+alter table actor add column create_date datetime not null 
+default '2020-10-01 00:00:00' after last_update; 
+添加行 insert into tablename (column name,column name) values (value,value)
+更新 UPDATE table_name
+    SET column1=value1,column2=value2,...
+    WHERE some_column=some_value;
+41.触发器
+create trigger audit_log
+after insert on employees_test
+for each row
+begin
+    insert into audit values(new.id,new.name);
+end
+42.删除
+delete from titles_test t where
+    t.id<>(
+        select * from(
+        select min(t1.id) from titles_test t1 where t.emp_no = t1.emp_no
+        group by emp_no) as a
+    )
+;
+44.replace
+replace into titles_test
+select 5, 10005, title, from_date, to_date
+from titles_test
+where id = 5;
